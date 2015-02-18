@@ -2,34 +2,51 @@ package com.example.sripadmanaban.basics;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallback{
+
+    private int LOCATION = 0;
+
+    private static final String FRAGMENT_TO_OPEN = "FragmentPosition";
 
     private Fragment fragment;
+
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setUpNavigationDrawer();
+
         if(savedInstanceState == null) {
-            // Add the fragment on initial activity setup
-            fragment = new LoginBatchRequestFragment();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.container, fragment, LoginBatchRequestFragment.class.getName())
-                    .commit();
+            // Adding the Login details fragment on starting
+            openFragmentByPosition(LOCATION);
         } else {
-            // Or set thefragment from restored state info
-            fragment = (LoginDetailsFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.container);
+            // Restoring the fragment that we need
+            LOCATION = savedInstanceState.getInt(FRAGMENT_TO_OPEN);
+            openFragmentByPosition(LOCATION);
         }
     }
 
+    private void setUpNavigationDrawer()
+    {
+        NavigationDrawerFragment mNavigationDrawerFragment =
+                (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer_fragment);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer_fragment, drawerLayout, toolbar);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,5 +68,49 @@ public class MainActivity extends FragmentActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openFragmentByPosition(int position)
+    {
+        LOCATION = position;
+        Fragment fragment;
+        switch (position)
+        {
+            case 0:
+                toolbar.setTitle(R.string.loginDetail_title);
+                fragment = new LoginDetailsFragment();
+                openFragment(fragment, "HomeFrag");
+                break;
+
+            case 1:
+                toolbar.setTitle(R.string.loginBatchRequest_title);
+                fragment = new LoginBatchRequestFragment();
+                openFragment(fragment, "DisplayFrag");
+                break;
+
+        }
+    }
+
+    private void openFragment(Fragment frag, String tag)
+    {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(tag);
+        if(fragment == null)
+        {
+            transaction.replace(R.id.container, frag, tag);
+        }
+        transaction.commit();
+    }
+
+    @Override
+    public void NavigationDrawerSelection(int position) {
+        LOCATION = position;
+        openFragmentByPosition(position);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(FRAGMENT_TO_OPEN, LOCATION);
     }
 }

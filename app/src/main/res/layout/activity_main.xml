@@ -4,9 +4,29 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <FrameLayout
-        android:id="@+id/container"
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawerLayout"
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <fragment
+            android:id="@+id/navigation_drawer_fragment"
+            android:layout_width="320dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:name="com.example.sripadmanaban.basics.NavigationDrawerFragment"
+            tools:layout="@layout/fragment_navigation_drawer" />
+
+    </android.support.v4.widget.DrawerLayout>
 
 </RelativeLayout>

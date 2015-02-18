@@ -6,5 +6,9 @@
     <string name="action_settings">Settings</string>
     <string name="app_id">1536116530010075</string>
     <string name="batchRequest">Batch Request</string>
+    <string name="drawer_open">The Navigation Drawer is open</string>
+    <string name="drawer_close">The Navigation Drawer is close</string>
+    <string name="loginDetail_title">Provides the Basic Data</string>
+    <string name="loginBatchRequest_title">Batch Request</string>
 
 </resources>
