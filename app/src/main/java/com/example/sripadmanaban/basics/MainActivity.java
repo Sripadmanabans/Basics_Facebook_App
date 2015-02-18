@@ -1,5 +1,6 @@
 package com.example.sripadmanaban.basics;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -16,7 +17,7 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private static final String FRAGMENT_TO_OPEN = "FragmentPosition";
 
-    private Fragment fragment;
+    SharedPreferences preferences;
 
     private Toolbar toolbar;
 
@@ -29,12 +30,12 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
         if(savedInstanceState == null) {
             // Adding the Login details fragment on starting
-            openFragmentByPosition(LOCATION);
+            LOCATION = 0;
         } else {
             // Restoring the fragment that we need
             LOCATION = savedInstanceState.getInt(FRAGMENT_TO_OPEN);
-            openFragmentByPosition(LOCATION);
         }
+        openFragmentByPosition(LOCATION);
     }
 
     private void setUpNavigationDrawer()
@@ -79,14 +80,19 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
             case 0:
                 toolbar.setTitle(R.string.loginDetail_title);
                 fragment = new LoginDetailsFragment();
-                openFragment(fragment, "HomeFrag");
+                openFragment(fragment, LoginDetailsFragment.class.getName());
                 break;
 
             case 1:
-                toolbar.setTitle(R.string.loginBatchRequest_title);
-                fragment = new LoginBatchRequestFragment();
-                openFragment(fragment, "DisplayFrag");
+                toolbar.setTitle(R.string.batchRequest_title);
+                fragment = new BatchRequestFragment();
+                openFragment(fragment, BatchRequestFragment.class.getName());
                 break;
+
+            case 2:
+                toolbar.setTitle(R.string.sendRequest_title);
+                fragment = new SendRequestFragment();
+                openFragment(fragment, SendRequestFragment.class.getName());
 
         }
     }

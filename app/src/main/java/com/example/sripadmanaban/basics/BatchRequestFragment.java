@@ -21,12 +21,12 @@ import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
 
 /**
- * This is used for the Batch Request Fragment
+ * This is used for the Send BatchRequest Fragment
  * Created by Sripadmanaban on 2/17/2015.
  */
-public class LoginBatchRequestFragment extends Fragment {
+public class BatchRequestFragment extends Fragment {
 
-    private static final String TAG = "LoginBatchRequestFragment";
+    private static final String TAG = "BatchRequestFragment";
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
@@ -69,9 +69,7 @@ public class LoginBatchRequestFragment extends Fragment {
     private void onSessionStateChange(final Session session, SessionState sessionState, Exception exception) {
         if(sessionState.isOpened()) {
             Log.i(TAG, "Logged in...");
-
             batchRequestButton.setVisibility(View.VISIBLE);
-
         } else if(sessionState.isClosed()) {
             Log.i(TAG, "Logged out...");
             batchRequestButton.setVisibility(View.INVISIBLE);

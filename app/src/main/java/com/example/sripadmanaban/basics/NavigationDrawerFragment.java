@@ -25,7 +25,7 @@ import android.widget.ListView;
 public class NavigationDrawerFragment extends Fragment {
     private NavigationDrawerCallback mCallback;
 
-    private String options[] = {"Login Detail", "Login Bath Request"};
+    private String options[] = {"Login Detail", "Login Bath Request", "Send Request"};
 
     private ListView mListView;
     private DrawerLayout mDrawerLayout;
