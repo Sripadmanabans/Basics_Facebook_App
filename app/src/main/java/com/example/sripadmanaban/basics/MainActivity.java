@@ -1,6 +1,5 @@
 package com.example.sripadmanaban.basics;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -16,8 +15,6 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
     private int LOCATION = 0;
 
     private static final String FRAGMENT_TO_OPEN = "FragmentPosition";
-
-    SharedPreferences preferences;
 
     private Toolbar toolbar;
 

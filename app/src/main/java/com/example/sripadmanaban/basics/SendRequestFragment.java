@@ -1,6 +1,7 @@
 package com.example.sripadmanaban.basics;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import com.facebook.widget.WebDialog;
  */
 public class SendRequestFragment extends Fragment {
     private static final String TAG = "SendRequestFragment";
+    private String requestId;
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
         @Override
@@ -64,12 +66,33 @@ public class SendRequestFragment extends Fragment {
     }
 
     private void onSessionStateChange(final Session session, SessionState sessionState, Exception exception) {
+        if(sessionState.isOpened() && requestId != null) {
+            Toast.makeText(getActivity().getApplicationContext(), "Incoming Request",
+                    Toast.LENGTH_SHORT).show();
+            requestId = null;
+        }
         if(sessionState.isOpened()) {
             Log.i(TAG, "Logged in...");
             sendRequestButton.setVisibility(View.VISIBLE);
         } else if(sessionState.isClosed()) {
             Log.i(TAG, "Logged out...");
             sendRequestButton.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        //Check for an incoming notification. Save the info
+        Uri intentUri = getActivity().getIntent().getData();
+        if(intentUri != null) {
+            String requestIdParam = intentUri.getQueryParameter("request_ids");
+            if(requestIdParam != null) {
+                String array[] = requestIdParam.split(",");
+                requestId = array[0];
+                Log.i(TAG, "Request Id: " + requestId);
+            }
         }
     }
 
