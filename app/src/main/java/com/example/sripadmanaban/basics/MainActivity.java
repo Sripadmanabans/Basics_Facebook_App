@@ -1,6 +1,7 @@
 package com.example.sripadmanaban.basics;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,7 +9,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends FragmentActivity {
 
-    private LoginFragment loginFragment;
+    private Fragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,14 +18,14 @@ public class MainActivity extends FragmentActivity {
 
         if(savedInstanceState == null) {
             // Add the fragment on initial activity setup
-            loginFragment = new LoginFragment();
+            fragment = new LoginBatchRequestFragment();
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.container, loginFragment, LoginFragment.class.getName())
+                    .add(R.id.container, fragment, LoginBatchRequestFragment.class.getName())
                     .commit();
         } else {
             // Or set thefragment from restored state info
-            loginFragment = (LoginFragment) getSupportFragmentManager()
+            fragment = (LoginDetailsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.container);
         }
     }
