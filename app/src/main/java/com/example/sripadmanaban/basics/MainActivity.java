@@ -1,14 +1,15 @@
 package com.example.sripadmanaban.basics;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
 
 public class MainActivity extends ActionBarActivity implements NavigationDrawerFragment.NavigationDrawerCallback{
 
@@ -18,22 +19,40 @@ public class MainActivity extends ActionBarActivity implements NavigationDrawerF
 
     private Toolbar toolbar;
 
+    private boolean intentReceived;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Uri intentUri = getIntent().getData();
+        if(intentUri != null) {
+            String requestIdParam = intentUri.getQueryParameter("request_ids");
+            if(requestIdParam != null) {
+                Log.i("MainActivity", "The intent was received open the send request fragment");
+                intentReceived = true;
+                LOCATION = 2;
+            }
+        }
+
         setUpNavigationDrawer();
 
-        if(savedInstanceState == null) {
-            // Adding the Login details fragment on starting
-            LOCATION = 0;
+        if(intentReceived) {
+            intentReceived = false;
+            openFragmentByPosition(LOCATION);
+            Log.i("MainActivity", "here");
         } else {
-            // Restoring the fragment that we need
-            LOCATION = savedInstanceState.getInt(FRAGMENT_TO_OPEN);
+            if (savedInstanceState == null) {
+                    // Adding the Login details fragment on starting
+                    LOCATION = 0;
+                } else {
+                    // Restoring the fragment that we need
+                    LOCATION = savedInstanceState.getInt(FRAGMENT_TO_OPEN);
+                }
+                openFragmentByPosition(LOCATION);
+            }
         }
-        openFragmentByPosition(LOCATION);
-    }
 
     private void setUpNavigationDrawer()
     {

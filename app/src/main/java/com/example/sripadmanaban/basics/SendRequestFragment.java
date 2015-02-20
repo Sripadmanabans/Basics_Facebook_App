@@ -14,11 +14,19 @@ import android.widget.Toast;
 
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookRequestError;
+import com.facebook.HttpMethod;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
+import com.facebook.model.GraphObject;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.WebDialog;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * This fragment is used to send request
@@ -67,8 +75,7 @@ public class SendRequestFragment extends Fragment {
 
     private void onSessionStateChange(final Session session, SessionState sessionState, Exception exception) {
         if(sessionState.isOpened() && requestId != null) {
-            Toast.makeText(getActivity().getApplicationContext(), "Incoming Request",
-                    Toast.LENGTH_SHORT).show();
+            getRequestData(requestId);
             requestId = null;
         }
         if(sessionState.isOpened()) {
@@ -136,9 +143,17 @@ public class SendRequestFragment extends Fragment {
     private void sendRequestDialog() {
         Bundle params = new Bundle();
         params.putString("message", "Learn how to make your Android Apps social");
-        params.putString("data",
-                "{\"badge_of_awesomeness\":\"1\","+
-                "\"social_karma\":\"5\"}");
+        JSONObject data = new JSONObject();
+        try {
+            data.put("badge_of_awesomeness", "1");
+            data.put("social_karma", "5");
+            data.put("fragment", "2");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            Log.i("Data", data.toString());
+        }
+        params.putString("data", data.toString());
 
         WebDialog requestDialog = (new WebDialog.RequestsDialogBuilder(getActivity(),
                 Session.getActiveSession(),
@@ -172,6 +187,84 @@ public class SendRequestFragment extends Fragment {
                 })
                 .build();
         requestDialog.show();
+    }
+
+    private void getRequestData(final String inRequestId) {
+        // Create a new request for an HTTP GET with the
+        // request ID as the Graph path
+        final Request request = new Request(Session.getActiveSession(),
+                inRequestId, null, HttpMethod.GET, new Request.Callback() {
+            @Override
+            public void onCompleted(Response response) {
+                // Process the returned response
+                GraphObject graphObject = response.getGraphObject();
+                FacebookRequestError error = response.getError();
+                boolean processError = false;
+                // Default Message
+                String message = "Incoming Message";
+                if(graphObject != null) {
+                    // Check if there is extra data
+                    if(graphObject.getProperty("data") != null) {
+                        // Get the data and parse info to get the key/value info
+                        try {
+                            JSONObject dataObject =
+                                    new JSONObject((String) graphObject.getProperty("data"));
+                            Log.i(TAG, dataObject.toString());
+                            // Get the value of key - badge_of_awesomeness
+                            String badge =
+                                    dataObject.getString("badge_of_awesomeness");
+                            // Get the value of key - social_karma
+                            String karma =
+                                    dataObject.getString("social_karma");
+                            // Get the sender's name
+                            JSONObject fromObject =
+                                    (JSONObject) graphObject.getProperty("from");
+                            String sender = fromObject.getString("name");
+                            String title = sender + " sent you a gift";
+                            // Create the text for the alert based on the text
+                            // and the data
+                            message = title + "\n\n" +
+                                    "Badge: " + badge +
+                                    " Karma: " + karma;
+                        } catch (JSONException e) {
+                            message = "Error getting request info";
+                            processError = true;
+                        }
+                    } else if(error !=  null) {
+                        message = "Error getting request info";
+                        processError = true;
+                    }
+                } else {
+                    message = "null";
+                }
+                Toast.makeText(getActivity().getApplicationContext(),
+                        message,
+                        Toast.LENGTH_SHORT).show();
+                if(!processError) {
+                    deleteRequest(inRequestId);
+                }
+            }
+        });
+        // Execute the request asynchronously
+        Request.executeBatchAsync(request);
+    }
+
+    private void deleteRequest(String inRequestId) {
+        // Create a new request for an HTTP delete with the
+        // request ID as the Graph path.
+        Request request = new Request(Session.getActiveSession(),
+                inRequestId, null, HttpMethod.DELETE, new Request.Callback() {
+            @Override
+            public void onCompleted(Response response) {
+                // Show a confirmation of the deletion
+                // when the API call completes successfully.
+                Toast.makeText(getActivity().getApplicationContext(), "Request deleted",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Execute the request asynchronously
+        Request.executeBatchAsync(request);
     }
 
 }
